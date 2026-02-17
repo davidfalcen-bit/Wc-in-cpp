@@ -39,7 +39,7 @@ int main(int argc, char * argv[]){
       return EXIT_FAILURE;
     }
 
-    Counter counter{opts};
+    Counter counter{};
     // TODO: handle summing up totals in the loop below
     FileCounts totals{};
     totals.file_name = "total";

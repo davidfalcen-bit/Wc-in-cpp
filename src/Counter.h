@@ -6,7 +6,7 @@
 class Counter 
 {
 public:
-  Counter(const Options& opts);
+  Counter() = default;
   FileCounts process(const std::string &file_name);
 private:
     Options opts;

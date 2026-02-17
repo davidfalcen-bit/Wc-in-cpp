@@ -1,6 +1,5 @@
 #include "Counter.h"
 #include "Filecounter.h"
-#include "Options.h"
 #include <cctype>
 #include <cstddef>
 #include <fstream>
@@ -9,9 +8,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-
-Counter::Counter(const Options& opts) : opts(opts) {}
-
 
 size_t char_counter(const std::string_view line){
     size_t count{0};
