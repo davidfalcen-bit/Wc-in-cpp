@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -30,12 +31,16 @@ size_t word_counter(const std::string_view line){
 }
 
 FileCounts Counter::process(const std::string &file_name){
+    std::unique_lock<std::mutex> lock(stdin_mutex, std::defer_lock);
     FileCounts co{};
     co.file_name = file_name;
     std::string buffer{};
     std::istream *input_stream = nullptr;
     std::ifstream file;
-    if(file_name == "stdin") input_stream = &(std::cin);
+    if(file_name == "stdin") {
+        lock.lock();
+        input_stream = &(std::cin);
+    }
     else{
         file.open(file_name);
         if(!file) throw std::invalid_argument("Not existing file");

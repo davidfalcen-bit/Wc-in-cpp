@@ -1,6 +1,9 @@
+#include <cstddef>
 #include <exception>
 #include <iostream>
 #include <string_view>
+#include <thread>
+#include <vector>
 #include "src/Options.h"
 #include "src/Counter.h"
 #include "src/Filecounter.h"
@@ -38,19 +41,30 @@ int main(int argc, char * argv[]){
       std::cout << "Try `wc --help` for more information.\n";
       return EXIT_FAILURE;
     }
-
+    
+    std::vector<FileCounts> mem_saver(opts.file_names().size());
+    std::vector<std::thread> threads;
+    threads.reserve(opts.file_names().size());
     Counter counter{};
-    // TODO: handle summing up totals in the loop below
     FileCounts totals{};
     totals.file_name = "total";
-    for (const auto &file_name : opts.file_names())
-    {
-      auto counts = counter.process(file_name);
-      counts.print(std::cout, opts);
-      totals+=counts;
+    
+    for(size_t i = 0; i < opts.file_names().size(); i++){
+        threads.emplace_back([&target = mem_saver[i], &file = opts.file_names()[i], &counter](){target = counter.process(file);});
     }
+    for(size_t i = 0; i < threads.size(); i++){
+       threads[i].join();
+       mem_saver[i].print(std::cout, opts);
+       totals+=mem_saver[i];
+    }
+    
+    // for (const auto &file_name : opts.file_names())
+    // {
+    //   auto counts = counter.process(file_name);
+    //   counts.print(std::cout, opts);
+    //   totals+=counts;
+    // }
     totals.print(std::cout, opts);
-    // TODO: print totals if mor than one file processed
 
 
     return EXIT_SUCCESS;
